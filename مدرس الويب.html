@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مدرس الويب</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#1c2230;--mute:#667085;--brand:#2f6fed;--brand-ink:#fff;--line:#e3e6ee;--code:#0f172a;--code-ink:#e2e8f0;--me:#e8f0ff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1117;--card:#161b26;--ink:#e8ecf4;--mute:#97a0b3;--brand:#5b8def;--line:#262d3d;--me:#1d2a47}}
+:root[data-theme="dark"]{--bg:#0e1117;--card:#161b26;--ink:#e8ecf4;--mute:#97a0b3;--brand:#5b8def;--line:#262d3d;--me:#1d2a47}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,"Noto Naskh Arabic",Arial,sans-serif;line-height:1.7;display:flex;flex-direction:column}
+header{padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+header h1{font-size:18px;margin:0}header small{color:var(--mute)}
+#log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:min(720px,92%);padding:10px 14px;border-radius:14px;border:1px solid var(--line);background:var(--card);word-wrap:break-word}
+.me{align-self:flex-start;background:var(--me)}
+.bot{align-self:flex-end}
+pre{direction:ltr;text-align:left;background:var(--code);color:var(--code-ink);padding:12px;border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.5;margin:8px 0}
+code{direction:ltr;unicode-bidi:embed;background:rgba(127,127,127,.18);padding:1px 5px;border-radius:5px;font-size:.92em}
+pre code{background:none;padding:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{border:1px solid var(--brand);color:var(--brand);background:transparent;border-radius:999px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+form{display:flex;gap:8px;padding:10px 12px;background:var(--card);border-top:1px solid var(--line)}
+textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit;background:var(--bg);color:var(--ink);max-height:120px}
+button.send{background:var(--brand);color:var(--brand-ink);border:0;border-radius:12px;padding:0 18px;font:inherit;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+.note{color:var(--mute);font-size:13px;text-align:center;padding:6px}
+</style>
+</head>
+<body>
+<header><span style="font-size:24px">🧑‍🏫</span><div><h1>مدرس الويب</h1><small>بيعلمك تعمل مواقع من الصفر، خطوة خطوة<span id="by"></span></small></div></header>
+<div id="log"></div>
+<div class="note" id="note"></div>
+<form id="f">
+<textarea id="q" rows="1" placeholder="اكتب سؤالك عن البرمجة..."></textarea>
+<button class="send" id="b" type="submit">ابعت</button>
+</form>
+<script>
+const SYSTEM = `انت مدرس برمجة ويب بتشرح بالتفصيل لمبتدئ مصري معاه صفر خبرة. هدفك إنه يفهم فعلاً مش بس ياخد كود.
+- انت المدرس الذكي بتاع الأكاديمية. لو حد سأل مين صنعك أو بتشتغل بإيه، قول إنك مساعد ذكاء اصطناعي للأكاديمية ومش هتدخل في التفاصيل التقنية، وماتدّعيش إنك إنسان.
+القواعد:
+- اتكلم بالعربي المصري البسيط، وماتفترضش إنه يعرف أي مصطلح. أي كلمة تقنية جديدة اشرحها أول مرة تظهر.
+- علّم تطوير الويب بس: HTML ثم CSS ثم JavaScript ثم responsive وGit والنشر. لو السؤال برا البرمجة اعتذر بجملة وارجع للبرمجة.
+- كل رد يمشي بالترتيب ده:
+  1) **الفكرة بكلام بسيط**: يعني إيه الحاجة دي وليه بنحتاجها.
+  2) **تشبيه من الحياة** (بيت، مطبخ، جرس باب...) يوضح الفكرة.
+  3) **مثال كود صغير وشغال**.
+  4) **شرح الكود سطر سطر**: كل سطر وإيه اللي بيعمله ولو غيرته إيه اللي هيحصل.
+  5) **أخطاء المبتدئين الشائعة** في الموضوع ده (غلطة أو اتنين) وإزاي يتجنبها.
+  6) **تمرين صغير** يجربه بنفسه، وقوله النتيجة المتوقعة.
+  7) اسأله لو عايز يكمل للخطوة اللي بعدها أو يعيد جزء مش فاهمه.
+- لو الشخص كتب كود فيه غلطة: حدد الغلطة فين بالظبط، اشرح ليه هي غلط، وبعدين وريه الصح واشرح الفرق.
+- لو قال «مش فاهم»، اشرح بطريقة تانية خالص بتشبيه جديد وبخطوات أصغر، ماتعيدش نفس الكلام.
+- اشرح الفكرة الواحدة كاملة قبل ما تنتقل لغيرها، ولو الموضوع كبير قسّمه على أكتر من رد.
+- اكتب الكود جوه \`\`\` وسمّي اللغة، واستخدم \`\` للكلمات التقنية القصيرة.`;
+const START = ["ابدأ من الصفر", "يعني ايه HTML؟", "ازاي أعمل أول صفحة؟", "اعمل لي صفحة هبوط لعيادة"];
+const log = document.getElementById('log'), q = document.getElementById('q'), b = document.getElementById('b'), note = document.getElementById('note');
+const OWNER = ''; // اكتب اسمك هنا
+if(OWNER) document.getElementById('by').textContent=' · من إعداد '+OWNER;
+let history = [], sample = null, busy = false;
+
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function fmt(t){
+  const parts = t.split(/```/);
+  return parts.map((p,i)=>{
+    if(i%2===1){const nl=p.indexOf('\n');const code=nl>-1?p.slice(nl+1):p;return '<pre><code>'+esc(code.replace(/\n$/,''))+'</code></pre>'}
+    return esc(p).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>');
+  }).join('');
+}
+function add(cls, html){const d=document.createElement('div');d.className='msg '+cls;d.innerHTML=html;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+
+add('bot','أهلا! أنا هعلمك تعمل مواقع من الصفر، بالراحة وخطوة خطوة. ابدأ بأي سؤال، أو اختار من هنا:<div class="chips" id="chips"></div>');
+START.forEach(s=>{const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=s;c.onclick=()=>ask(s);document.getElementById('chips').appendChild(c)});
+
+(async()=>{
+  try{ sample = await window.claude.use('sample'); }catch(e){ sample = null; }
+  if(!sample){ note.textContent='المساعد الذكي مش متاح في العرض ده. جرّب تفتح الصفحة تاني بعد تسجيل الدخول.'; b.disabled=true; }
+})();
+
+async function ask(text){
+  text=(text||'').trim(); if(!text||busy||!sample) return;
+  busy=true; b.disabled=true; q.value='';
+  add('me',esc(text));
+  history.push({role:'user',content:text});
+  const out=add('bot','...');
+  const msgs = history.slice(-11).map(m=>({role:m.role,content:m.content}));
+  while(msgs.length && msgs[0].role!=='user') msgs.shift();
+  msgs[0] = {role:'user', content: SYSTEM + '\n\n---\nالمحادثة بتبدأ هنا:\n' + msgs[0].content};
+  try{
+    const r = await sample(msgs,{cache:false,onText:({text})=>{out.innerHTML=fmt(text);log.scrollTop=log.scrollHeight}});
+    out.innerHTML=fmt(r.text);
+    history.push({role:'assistant',content:r.text});
+  }catch(e){
+    history.pop();
+    out.textContent = e && e.code==='rate_limited' ? 'في زحمة، استنى شوية وجرب تاني.' : e && e.code==='not_granted' ? 'لازم توافق على الصلاحية عشان المدرس يشتغل.' : 'حصلت مشكلة، جرب تاني.';
+  }
+  busy=false; b.disabled=false; q.focus();
+}
+document.getElementById('f').addEventListener('submit',e=>{e.preventDefault();ask(q.value)});
+q.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask(q.value)}});
+</script>
+</body>
+</html>
